@@ -1,29 +1,35 @@
 class DosesController < ApplicationController
 
   def new
-    @dose = DOSE.new
-    @cocktail = Cocktail.find(:id)
+    @cocktail = Cocktail.find(params[:cocktail_id])
+    @dose = Dose.new
     # correct cocktail
   end
 
   def create
-    @dose = DOSE.new(dose_params)
+    @cocktail = Cocktail.find(params[:cocktail_id])
+    @dose = Dose.new(dose_params)
+    @dose.cocktail = @cocktail # this does belong to the found cocktail (.cocktail = cocktail id of this dose)
     if @dose.save
-      redirect_to cocktails_path(@cocktail)
+      redirect_to cocktail_path(@cocktail) # to the correct id back
     else
-      render "new" # need to create the view!
+      render :new # need to create the view!
     end
   end
 
   def destroy
+    @dose = Dose.find(params[:id])
     @dose.destroy
-    redirect_to dose_path
+    redirect_to cocktails_path(@dose.cocktail)
   end
 
   private
 
   def dose_params
-    params.require(:dose).permit(:description, :ingredient)
+    params.require(:dose).permit(:description, :cocktail_id, :ingredient_id)
   end
 end
+
+
+# some new params => rouets
 
